@@ -1,0 +1,80 @@
+server:
+  port: 8004
+
+spring:
+  application.name: user-service
+
+  datasource:
+    url: jdbc:h2:mem:userDB;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+
+jwt:
+  private-key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCT9a/CHfpvjGOF
+    rSO/zHN3bxdrdRDxqO40yHkURPsL1J/AQukKxcRIcgUqSRyDrACmrKBX81MkODKj
+    hNGPOr5QTqgXaJ0GBwlqiWULzsDqWJlOYt8lsjQap+csaIcK3sHNDBxwD2r+Xq9t
+    adVv1N3V/i8sn7mBwg9ttF2aQHazDAX9oHIdSdJnJbYcbspmQBnv0JKp+kd/XZm+
+    fe9be3HhQteGscRc/zny93YSGfxbPSNUpGcAC8YwU/3Ngo6iGdlwzQG5r35waAvM
+    KkaLlS68T/JOvH1dc0RQ8vvynmZryLPUfmkNyoBc8LUD0BTfXVyW1IVip3EI69Fo
+    G22BTbAfAgMBAAECggEARdszljTNLqlbu5tZS47d3T/IEOX+j/owLR+Reu5ukNFc
+    c0uj94AUAhhDNAm8urYUwJy0P5IUaP9XeTiWMEeN3yCj4Bl2OYhM+83OtVpyXrJh
+    /05TCNswGn23eZIIYCt32LWlH4tH+rz9mmzjZp9b9VLDNxBaZ1cWLbeAkflpkXKd
+    6u40yjBx4NwYcxK/brsSGat2uW3UVRZmrKTe3S2kgFECBtL5gVq1wO01Z5sBV+yC
+    VfVg3y0VMVC9jyIHwN45lGF1TFrhhLnPDbP3t8rEgDc9yRJz1RMavB56RdB7s8JY
+    baOSDlU5UfZo+doY/hSYkIp9VEjca66KKxE+3qoskQKBgQDI5v/2dsMCJi1JwRPT
+    6k6RsYj7Sa0JBMJiMYQlXFi79YqrRObsxSlrWPhYIZRaSmpWnkutiSyEvbkSVxvs
+    VxDxZx3DR7ripEgx6TOHQe8/zYL1WJnTh9elICTstn/BipF6yWdj/iLp6GQ2zx+C
+    BfElyUd7c1vcq4u9D/oB2fOiDQKBgQC8ia2CBJHuvUF8ADAAnYNrxrKMZegX+5nx
+    4Pj3PGe/a00xcAh+b0bICQ16Ihf79VcGeWwtTlDIPKmGC+QFPL0ATrGhHfHHszXH
+    IE/f52uvZoEnHvBFIftD/VEgMXUGG8JIcuPK4eQvnzFggGq4rKqO4+W3OdrWoZ/F
+    PGLMcDmL2wKBgB6VlBf4Qn28RB67RwJ25Bkn9tuSfsYltFXwhdaONW//1Gl4ZtNa
+    vJB8DeqUyhnoxEGFfa3geSeIHnmdS0Hyi0DE2vIUpG3GZrs6bj7EGeETr0EciOZ8
+    Aqc/un9S1SYoqzcPHC9LzBLh7wetBnXr46dF+hzgFfcFIpPYr83CWWWtAoGACIha
+    l+XJDPr3ubrwcTavufL2JbB+/obegrnhyp6rO1iJ19DwMXirxWXTfFGKsFZ8J8jb
+    Annm4gkMywpCuZH0I81r8JTAWn9b0bU+qC17DCchdTnLOfW9v2f5gfF7EFm1Qz4f
+    3RC4GQelXm6xZcY6udjKjq5JnykVaAHBnur9T70CgYBbRMX5i7IJ2nP7I7Y78W4P
+    mx5PnvFnRFirhaAlRSlRRJVtWH5/GJ9CejbZ9/9395AysYPq2jNdzeF6KGZJ3wGF
+    OFPl2RniOUUEpJ7FtG7WYDDP60p5L7S9bfgIn7a9r0YWnaWyHHi25C2zYXtryADS
+    ibjRd46gQKCIWx3B5yuNjQ==
+    -----END PRIVATE KEY-----
+
+  public-key: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk/Wvwh36b4xjha0jv8xz
+    d28Xa3UQ8ajuNMh5FET7C9SfwELpCsXESHIFKkkcg6wApqygV/NTJDgyo4TRjzq+
+    UE6oF2idBgcJaollC87A6liZTmLfJbI0GqfnLGiHCt7BzQwccA9q/l6vbWnVb9Td
+    1f4vLJ+5gcIPbbRdmkB2swwF/aByHUnSZyW2HG7KZkAZ79CSqfpHf12Zvn3vW3tx
+    4ULXhrHEXP858vd2Ehn8Wz0jVKRnAAvGMFP9zYKOohnZcM0Bua9+cGgLzCpGi5Uu
+    vE/yTrx9XXNEUPL78p5ma8iz1H5pDcqAXPC1A9AU311cltSFYqdxCOvRaBttgU2w
+    HwIDAQAB
+    -----END PUBLIC KEY-----
+  expire:
+    access-token: 24  # ?? ??
+    refresh-token: 24
+
