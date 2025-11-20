@@ -1,3 +1,5 @@
 rootProject.name = 'coupon-promotion'
 
-include ('discovery-service', 'user-service')
+include('discovery-service',
+        'user-service',
+        'api-gateway')
