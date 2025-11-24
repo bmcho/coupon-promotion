@@ -54,7 +54,7 @@
         private Mono<Long> validateToken(String token) {
             return webClient.post()
                     .uri("/auth/validate")
-                    .bodyValue(Map.of("token", token))
+                    .bodyValue(Map.of ("token", token))
                     .header("Content-Type", "application/json")
                     .retrieve()
                     .bodyToMono(Map.class)
