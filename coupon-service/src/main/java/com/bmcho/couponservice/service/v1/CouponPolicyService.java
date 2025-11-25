@@ -2,6 +2,7 @@ package com.bmcho.couponservice.service.v1;
 
 import com.bmcho.couponservice.domain.CouponPolicy;
 import com.bmcho.couponservice.dto.v1.CouponPolicyDto;
+import com.bmcho.couponservice.exception.CouponPolicyNotFoundException;
 import com.bmcho.couponservice.repository.CouponPolicyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
