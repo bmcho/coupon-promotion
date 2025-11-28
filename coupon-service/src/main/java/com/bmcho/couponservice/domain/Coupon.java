@@ -13,6 +13,15 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "coupon",
+        uniqueConstraints = {
+    @UniqueConstraint(
+            name = "uk_coupon_policy_user",
+            columnNames = {"coupon_policy_id", "user_id"}
+    )
+}
+)
 public class Coupon {
 
     @Id
