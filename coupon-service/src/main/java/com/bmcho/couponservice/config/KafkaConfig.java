@@ -1,4 +1,4 @@
-package com.bmcho.couponservice.config.interceptor;
+package com.bmcho.couponservice.config;
 
 import com.bmcho.couponservice.dto.v3.CouponDto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Configuration
 public class KafkaConfig {
-    private static final String BOOTSTRAP_SERVERS = "localhost:9092";
+    private static final String BOOTSTRAP_SERVERS = "localhost:9091";
     private static final String GROUP_ID = "coupon-service";
 
     @Bean
