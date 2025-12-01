@@ -34,7 +34,7 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'  # 컨트롤러 통신용 리스너
 
       # 복제 관련 설정
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_REPLICA TION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     volumes:
@@ -53,6 +53,32 @@ services:
     depends_on:
       - kafka
 
+  mysql:
+    image: mysql:8.4 # 애플 실리콘 이슈
+    container_name: coupon-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: coupon
+      MYSQL_USER: coupon-user
+      MYSQL_PASSWORD: user1234!
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/db/mysql/init:/docker-entrypoint-initdb.d
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 networks:
   promotion_network:
     driver: bridge
+
+volumes:
+  mysql_data:

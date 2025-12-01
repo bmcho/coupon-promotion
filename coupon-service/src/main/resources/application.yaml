@@ -5,11 +5,28 @@ server:
 spring:
   application.name: coupon-service
 
+#  datasource:
+#    url: jdbc:h2:mem:coupondb
+#    driver-class-name: org.h2.Driver
+#    username: sa
+#    password:
+
   datasource:
-    url: jdbc:h2:mem:coupondb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    hikari:
+      jdbc-url: jdbc:mysql://localhost:3306/coupon
+      username: coupon-user
+      password: user1234!
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+      #connection pool
+      pool-name: HikariCP
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 20000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
 
   jpa:
     hibernate:
