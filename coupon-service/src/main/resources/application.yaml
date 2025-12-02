@@ -5,11 +5,11 @@ server:
 spring:
   application.name: coupon-service
 
-#  datasource:
-#    url: jdbc:h2:mem:coupondb
-#    driver-class-name: org.h2.Driver
-#    username: sa
-#    password:
+  #  datasource:
+  #    url: jdbc:h2:mem:coupondb
+  #    driver-class-name: org.h2.Driver
+  #    username: sa
+  #    password:
 
   datasource:
     hikari:
@@ -51,3 +51,19 @@ eureka:
       defaultZone: http://localhost:8761/eureka
     fetch-registry: true
     register-with-eureka: true
+
+management:
+  server:
+    port: 8080
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus #metrics 실서비스에서는 빼는걸로 보안문제
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 50ms,100ms,200ms

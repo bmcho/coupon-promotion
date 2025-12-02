@@ -1,5 +1,6 @@
 package com.bmcho.couponservice.service.v3;
 
+import com.bmcho.couponservice.aop.CouponMetered;
 import com.bmcho.couponservice.dto.v3.CouponDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class CouponConsumer {
 
     private final CouponService couponService;
-
 
     @KafkaListener(topics = "coupon-issue-requests", groupId = "coupon-service", containerFactory = "couponKafkaListenerContainerFactory")
     public void consumeCouponIssueRequest(CouponDto.IssueMessage message) {

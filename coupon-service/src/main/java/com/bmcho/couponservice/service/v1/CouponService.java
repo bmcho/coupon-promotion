@@ -1,5 +1,6 @@
 package com.bmcho.couponservice.service.v1;
 
+import com.bmcho.couponservice.aop.CouponMetered;
 import com.bmcho.couponservice.config.interceptor.UserIdInterceptor;
 import com.bmcho.couponservice.domain.Coupon;
 import com.bmcho.couponservice.domain.CouponPolicy;
@@ -52,6 +53,7 @@ public class CouponService {
      * 분산 환경에서 여러 서버가 동시에 쿠폰을 발급할 경우
      * DB 레벨의 락만으로는 정확한 수량 제어가 어려움
      */
+    @CouponMetered
     @Transactional(noRollbackFor = DataIntegrityViolationException.class)
     public Coupon issueCoupon(CouponDto.IssueRequest request) {
         CouponPolicy couponPolicy = couponPolicyRepository.findByIdWithLock(request.getCouponPolicyId())

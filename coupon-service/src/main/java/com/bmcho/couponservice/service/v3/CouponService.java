@@ -1,5 +1,6 @@
 package com.bmcho.couponservice.service.v3;
 
+import com.bmcho.couponservice.aop.CouponMetered;
 import com.bmcho.couponservice.config.interceptor.UserIdInterceptor;
 import com.bmcho.couponservice.domain.Coupon;
 import com.bmcho.couponservice.domain.CouponPolicy;
@@ -87,6 +88,7 @@ public class CouponService {
         }
     }
 
+    @CouponMetered(version = "v3")
     @Transactional
     public void issueCoupon(CouponDto.IssueMessage message) {
         try {
