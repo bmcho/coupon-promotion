@@ -2,6 +2,7 @@ package com.bmcho.couponservice.service.v2;
 
 import com.bmcho.couponservice.domain.Coupon;
 import com.bmcho.couponservice.dto.v1.CouponDto;
+import com.bmcho.couponservice.exception.CouponIssueException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +14,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CouponStateService {
-    
+
     private final RedissonClient redissonClient;
     private final ObjectMapper objectMapper;
-    
+
     private static final String COUPON_STATE_KEY = "coupon:state:";
-    
+
     /**
      * 쿠폰 상태를 Redis에 저장
+     *
      * @param coupon 상태를 저장할 쿠폰
      */
     public void updateCouponState(Coupon coupon) {
@@ -34,12 +36,13 @@ public class CouponStateService {
 
         } catch (Exception e) {
             log.error("Error updating coupon state: {}", e.getMessage(), e);
-            throw new RuntimeException("쿠폰 상태 업데이트 중 오류가 발생했습니다.", e);
+            throw new CouponIssueException("쿠폰 상태 업데이트 중 오류가 발생했습니다.: " + e.getMessage());
         }
     }
 
     /**
      * 쿠폰 상태를 Redis에서 가져옴
+     *
      * @param couponId 상태를 가져올 쿠폰 ID
      * @return 쿠폰 상태, 없으면 null
      */
@@ -56,7 +59,7 @@ public class CouponStateService {
             return objectMapper.readValue(couponJson, CouponDto.Response.class);
         } catch (Exception e) {
             log.error("Error getting coupon state: {}", e.getMessage(), e);
-            throw new RuntimeException("쿠폰 상태 조회 중 오류가 발생했습니다.", e);
+            throw new CouponIssueException("쿠폰 상태 조회 중 오류가 발생했습니다." + e.getMessage());
         }
     }
 }

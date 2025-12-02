@@ -25,7 +25,7 @@ public class CouponPolicyService {
     @Transactional(readOnly = true)
     public CouponPolicy getCouponPolicy(Long id) {
         return couponPolicyRepository.findById(id)
-                .orElseThrow(() -> new CouponPolicyNotFoundException("쿠폰 정책을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CouponPolicyNotFoundException(id));
     }
 
     @Transactional(readOnly = true)

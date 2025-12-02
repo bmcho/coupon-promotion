@@ -4,21 +4,21 @@ import com.bmcho.couponservice.config.interceptor.UserIdInterceptor;
 import com.bmcho.couponservice.domain.Coupon;
 import com.bmcho.couponservice.domain.CouponPolicy;
 import com.bmcho.couponservice.dto.v3.CouponDto;
-import com.bmcho.couponservice.exception.CouponIssueException;
-import com.bmcho.couponservice.exception.CouponNotFoundException;
+import com.bmcho.couponservice.exception.*;
 import com.bmcho.couponservice.repository.CouponRepository;
 import com.bmcho.couponservice.service.v2.CouponPolicyService;
 import com.bmcho.couponservice.service.v2.CouponStateService;
+import com.bmcho.couponservice.utll.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -48,17 +48,17 @@ public class CouponService {
         try {
             boolean isLocked = lock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, TimeUnit.SECONDS);
             if (!isLocked) {
-                throw new CouponIssueException("쿠폰 발급 요청이 많아 처리할 수 없습니다. 잠시 후 다시 시도해주세요.");
+                throw new CouponIssueTooManyRequestsException();
             }
 
             CouponPolicy couponPolicy = couponPolicyService.getCouponPolicy(request.getCouponPolicyId());
             if (couponPolicy == null) {
-                throw new IllegalArgumentException("쿠폰 정책을 찾을 수 없습니다.");
+                throw new CouponPolicyNotFoundException(request.getCouponPolicyId());
             }
 
             LocalDateTime now = LocalDateTime.now();
             if (now.isBefore(couponPolicy.getStartTime()) || now.isAfter(couponPolicy.getEndTime())) {
-                throw new IllegalStateException("쿠폰 발급 기간이 아닙니다.");
+                throw new CouponIssueNotAvailableException();
             }
 
             RAtomicLong atomicQuantity = redissonClient.getAtomicLong(quantityKey);
@@ -66,7 +66,7 @@ public class CouponService {
 
             if (remainingQuantity < 0) {
                 atomicQuantity.incrementAndGet();
-                throw new CouponIssueException("쿠폰이 모두 소진되었습니다.");
+                throw new CouponOutOfStockException();
             }
 
             couponProducer.sendCouponIssueRequest(
@@ -79,7 +79,7 @@ public class CouponService {
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new CouponIssueException("쿠폰 발급 중 오류가 발생했습니다.");
+            throw new CouponIssueException();
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -92,7 +92,7 @@ public class CouponService {
         try {
             CouponPolicy policy = couponPolicyService.getCouponPolicy(message.getPolicyId());
             if (policy == null) {
-                throw new IllegalArgumentException("쿠폰 정책을 찾을 수 없습니다.");
+                throw new CouponPolicyNotFoundException(message.getPolicyId());
             }
             Coupon coupon = Coupon.builder()
                     .couponPolicy(policy)
@@ -106,24 +106,26 @@ public class CouponService {
 
         } catch (DataIntegrityViolationException e) {
             // UNIQUE (coupon_policy_id, user_id) 위반이면 → 이미 발급된 케이스 (멱등)
-            if (isDuplicateKey(e)) {
+            if (Utils.isDuplicateKey(e)) {
                 log.info("Coupon already issued (idempotent): policyId={}, userId={}",
                         message.getPolicyId(), message.getUserId());
+
+                throw new CouponAlreadyIssuedException(message.getPolicyId(), message.getUserId());
                 // 예외를 다시 던지지 않음 → 정상 처리로 간주
             } else {
                 log.error("Failed to issue coupon (DB error): {}", e.getMessage(), e);
-                throw e; // 다른 DB 에러는 상위로 올려서 재시도/알람 대상
+                throw new CouponIssueException(e.getMessage());
             }
         } catch (Exception e) {
             log.error("Failed to issue coupon: {}", e.getMessage());
-            throw e;
+            throw new CouponIssueException(e.getMessage());
         }
     }
 
     @Transactional
     public Coupon useCoupon(Long couponId, Long orderId) {
         Coupon coupon = couponRepository.findByIdWithLock(couponId)
-                .orElseThrow(() -> new CouponNotFoundException("쿠폰을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CouponNotFoundException(couponId));
 
         coupon.use(orderId);
         couponStateService.updateCouponState(coupon);
@@ -134,10 +136,10 @@ public class CouponService {
     @Transactional
     public Coupon cancelCoupon(Long couponId) {
         Coupon coupon = couponRepository.findByIdAndUserId(couponId, UserIdInterceptor.getCurrentUserId())
-                .orElseThrow(() -> new IllegalArgumentException("쿠폰을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CouponNotFoundException(couponId));
 
         if (!coupon.isUsed()) {
-            throw new IllegalStateException("사용되지 않은 쿠폰은 취소할 수 없습니다.");
+            throw new CouponIssueException("사용되지 않은 쿠폰은 취소할 수 없습니다.", HttpStatus.FORBIDDEN);
         }
 
         coupon.cancel();
@@ -150,7 +152,4 @@ public class CouponService {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
     }
 
-    private boolean isDuplicateKey(DataIntegrityViolationException e) {
-        return e.getCause() instanceof SQLIntegrityConstraintViolationException;
-    }
 }

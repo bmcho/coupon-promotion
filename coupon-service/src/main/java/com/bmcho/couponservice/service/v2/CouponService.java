@@ -20,14 +20,14 @@ public class CouponService {
     public CouponDto.Response issueCoupon(CouponDto.IssueRequest request) {
         Coupon coupon = couponRedisService.issueCoupon(request);
         couponStateService.updateCouponState(couponRepository.findById(coupon.getId())
-                .orElseThrow(() -> new CouponNotFoundException("쿠폰을 찾을 수 없습니다.")));
+                .orElseThrow(() -> new CouponNotFoundException(coupon.getId())));
         return CouponDto.Response.from(coupon);
     }
     
     @Transactional
     public CouponDto.Response useCoupon(Long couponId, Long orderId) {
         Coupon coupon = couponRepository.findByIdWithLock(couponId)
-                .orElseThrow(() -> new CouponNotFoundException("쿠폰을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CouponNotFoundException(couponId));
         
         coupon.use(orderId);
         couponStateService.updateCouponState(coupon);
@@ -38,7 +38,7 @@ public class CouponService {
     @Transactional
     public CouponDto.Response cancelCoupon(Long couponId) {
         Coupon coupon = couponRepository.findByIdWithLock(couponId)
-                .orElseThrow(() -> new CouponNotFoundException("쿠폰을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CouponNotFoundException(couponId));
         
         coupon.cancel();
         couponStateService.updateCouponState(coupon);
@@ -53,7 +53,7 @@ public class CouponService {
         }
         
         Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new CouponNotFoundException("쿠폰을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CouponNotFoundException(couponId));
         
         CouponDto.Response response = CouponDto.Response.from(coupon);
         couponStateService.updateCouponState(coupon);

@@ -14,10 +14,13 @@ import java.util.Optional;
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
     Optional<Coupon> findByIdAndUserId(Long id, Long userId);
 
+    Optional<Coupon> findByCouponPolicyIdAndUserId(Long couponPolicyId, Long userId);
+
     @Query("SELECT COUNT(c) FROM Coupon c WHERE  c.couponPolicy.id = :policyId")
     Long countByCouponPolicyId(@Param("policyId") Long policyId);
 
     Page<Coupon> findByUserIdAndStatusOrderByCreatedAtDesc(Long userId, Coupon.Status status, Pageable pageable);
+
 
     /**
      * PESSIMISTIC_WRITE 를 사용하는 이유는 데이터의 일관성을 보장하기 위함

@@ -17,12 +17,13 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler(CouponAlreadyIssuedException.class)
-    public ResponseEntity<Map<String, Object>> handleCouponAlreadyIssued(CouponAlreadyIssuedException e) {
+    @ExceptionHandler(CouponBasicException.class)
+    public ResponseEntity<Map<String, Object>> handleCouponAlreadyIssued(CouponBasicException e) {
         return ResponseEntity
                 .status(HttpStatus.OK) // or OK (200) if you want hard idempotency
                 .body(Map.of(
-                        "message", e.getMessage()
+                        "message", e.getMessage(),
+                        "status", e.getStatus()
                 ));
     }
 }

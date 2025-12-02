@@ -2,6 +2,7 @@ package com.bmcho.couponservice.service.v2;
 
 import com.bmcho.couponservice.domain.CouponPolicy;
 import com.bmcho.couponservice.dto.v1.CouponPolicyDto;
+import com.bmcho.couponservice.exception.CouponIssueException;
 import com.bmcho.couponservice.exception.CouponPolicyNotFoundException;
 import com.bmcho.couponservice.repository.CouponPolicyRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -57,6 +58,7 @@ public class CouponPolicyService {
                 return objectMapper.readValue(policyJson, CouponPolicy.class);
             } catch (JsonProcessingException e) {
                 log.error("쿠폰 정책 정보를 역질렬화 하는 중 오류가 발생했습니다.", e);
+                throw new CouponIssueException(e.getMessage());
             }
         }
 
@@ -69,6 +71,7 @@ public class CouponPolicyService {
             bucket.set(policyJson);
         } catch (JsonProcessingException e) {
             log.error("쿠폰 정책 정보를 직렬화 하는 중 오류가 발생했습니다.", e);
+            throw new CouponIssueException(e.getMessage());
         }
 
         return couponPolicy;
