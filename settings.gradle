@@ -3,4 +3,5 @@ rootProject.name = 'coupon-promotion'
 include('discovery-service',
         'user-service',
         'api-gateway',
-        'coupon-service')
+        'coupon-service',
+        'point-service')

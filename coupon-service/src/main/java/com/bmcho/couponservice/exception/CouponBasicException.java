@@ -23,4 +23,5 @@ public abstract class CouponBasicException extends RuntimeException {
         super(message);
         this.status = HttpStatus.INTERNAL_SERVER_ERROR;
     }
+
 }
