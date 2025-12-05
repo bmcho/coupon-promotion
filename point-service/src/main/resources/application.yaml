@@ -47,4 +47,4 @@ management:
       percentiles-histogram:
         http.server.request: true
       slo:
-        http.server.request: 50ms,100ms,200ms
+        http.server.requests: 50ms,100ms,200ms
