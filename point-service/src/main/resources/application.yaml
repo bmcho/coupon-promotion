@@ -8,7 +8,7 @@ spring:
     hikari:
       jdbc-url: jdbc:mysql://localhost:3306/point
       username: point-user
-      password: user1234!
+      password: point1234!
       driver-class-name: com.mysql.cj.jdbc.Driver
       pool-name: HikariCP
       maximum-pool-size: 10
