@@ -10,6 +10,6 @@ public class InsufficientPointBalanceException extends PointBasicException {
 
     public InsufficientPointBalanceException(String message, Long balance, Long amount) {
         super("%s - balance: %d, amount: %d".formatted(message, balance, amount),
-                HttpStatus.FORBIDDEN);
+                HttpStatus.BAD_REQUEST);
     }
 }
