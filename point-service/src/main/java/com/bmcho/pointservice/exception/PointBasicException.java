@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public abstract class PointBasicException extends RuntimeException {
+public class PointBasicException extends RuntimeException {
 
     private final HttpStatus status;
 
@@ -18,7 +18,12 @@ public abstract class PointBasicException extends RuntimeException {
         this.status = status;
     }
 
-    public PointBasicException(String message, HttpStatus status, Throwable cause) {
+    public PointBasicException(String message, Throwable cause) {
+        super(message, cause);
+        this.status = HttpStatus.INTERNAL_SERVER_ERROR;;
+    }
+
+    public PointBasicException(String message, Throwable cause, HttpStatus status) {
         super(message, cause);
         this.status = status;
     }
