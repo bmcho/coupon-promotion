@@ -64,7 +64,7 @@ public class PointRedisService {
 
             pointBalance.addBalance(amount);
             pointBalance = pointBalanceRepository.save(pointBalance);
-            updateBalanceCache(userId, currentBalance);
+            updateBalanceCache(userId, pointBalance.getBalance());
 
             Point point = Point.builder()
                     .userId(userId)
@@ -111,7 +111,7 @@ public class PointRedisService {
             Long currentBalance = getBalance(userId);
 
             if (currentBalance < amount) {
-                throw new InsufficientPointBalanceException(amount, currentBalance);
+                throw new InsufficientPointBalanceException(currentBalance, amount);
             }
 
             PointBalance pointBalance = pointBalanceRepository.findByUserId(userId)
@@ -168,7 +168,7 @@ public class PointRedisService {
                 throw new LockAcquisitionFailedException(lockKey);
             }
 
-            if(originalPoint.getType() ==  PointType.CANCELED){
+            if (originalPoint.getType() == PointType.CANCELED) {
                 throw new PointAlreadyCanceled(pointId);
             }
 
