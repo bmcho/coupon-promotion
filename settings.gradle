@@ -4,4 +4,6 @@ include('discovery-service',
         'user-service',
         'api-gateway',
         'coupon-service',
-        'point-service')
+        'point-service',
+        'point-service-batch'
+)
