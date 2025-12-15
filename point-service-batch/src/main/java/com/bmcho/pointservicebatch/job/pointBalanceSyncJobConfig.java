@@ -62,11 +62,13 @@ public class pointBalanceSyncJobConfig {
      * 2. generateDailyReportStep: 전일 포인트 트랜잭션을 집계하여 일별 리포트 생성
      */
     @Bean
-    public Job pointBalanceSyncJob() {
+    public Job pointBalanceSyncJob(
+            Step syncPointBalanceRedisStep,
+            Step generateDailyReportStep) {
         return new JobBuilder("pointBalanceSyncJob", jobRepository)
                 .listener(jobCompletionNotificationListener)
-                .start(syncPointBalanceRedisStep())
-                .next(generateDailyReportStep())
+                .start(syncPointBalanceRedisStep)
+                .next(generateDailyReportStep)
                 .build();
     }
 
@@ -79,12 +81,16 @@ public class pointBalanceSyncJobConfig {
      * - Writer: Redis에 포인트 잔액 저장
      */
     @Bean
-    public Step syncPointBalanceRedisStep() {
+    public Step syncPointBalanceRedisStep(
+            JpaPagingItemReader<PointBalance> pointBalanceRedisReader,
+            ItemProcessor<PointBalance, Map.Entry<String, Long>> pointBalanceRedisProcessor,
+            ItemWriter<Map.Entry<String, Long>> pointBalanceRedisWriter
+    ) {
         return new StepBuilder("syncPointBalanceRedisStep", jobRepository)
                 .<PointBalance, Map.Entry<String, Long>>chunk(1000, transactionManager)
-                .reader(pointBalanceRedisReader())
-                .processor(pointBalanceRedisProcessor())
-                .writer(pointBalanceRedisWriter())
+                .reader(pointBalanceRedisReader)
+                .processor(pointBalanceRedisProcessor)
+                .writer(pointBalanceRedisWriter)
                 .build();
     }
 
@@ -97,12 +103,15 @@ public class pointBalanceSyncJobConfig {
      * - Writer: 일별 리포트를 DB에 저장
      */
     @Bean
-    public Step generateDailyReportStep() {
+    public Step generateDailyReportStep(
+            JpaPagingItemReader<Point> pointReader,
+            ItemProcessor<Point, DailyPointSummary> pointToDailyReportProcessor,
+            ItemWriter<DailyPointSummary> reportWriter) {
         return new StepBuilder("generateDailyReportStep", jobRepository)
                 .<Point, DailyPointSummary>chunk(1000, transactionManager)
-                .reader(pointReader(null))
-                .processor(pointToDailyReportProcessor())
-                .writer(reportWriter(null))
+                .reader(pointReader)
+                .processor(pointToDailyReportProcessor)
+                .writer(reportWriter)
                 .build();
     }
 
@@ -166,7 +175,7 @@ public class pointBalanceSyncJobConfig {
     public JpaPagingItemReader<Point> pointReader(
             @Value("#{jobParameters['reportDate']}") String reportDateStr
     ) {
-        LocalDate reportDate = (reportDateStr == null)
+        LocalDate reportDate = (reportDateStr ==  null)
                 ? LocalDate.now().minusDays(1)
                 : LocalDate.parse(reportDateStr);
 

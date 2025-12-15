@@ -2,11 +2,12 @@ spring:
   application.name: point-service-batch
 
   datasource:
+    url: jdbc:mysql://localhost:3306/point
+    username: point-user
+    password: point1234!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
     hikari:
-      jdbc-url: jdbc:mysql://localhost:3306/point
-      username: point-user
-      password: point1234!
-      driver-class-name: com.mysql.cj.jdbc.Driver
       pool-name: HikariCP
       maximum-pool-size: 10
       minimum-idle: 5
@@ -15,9 +16,14 @@ spring:
       max-lifetime: 1800000
       connection-test-query: SELECT 1
 
+  sql:
+    init:
+      mode: never
+      schema-locations: classpath:org/springframework/batch/core/schema-mysql.sql, classpath:schema.sql
+
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -30,7 +36,7 @@ spring:
 
   batch:
     job:
-      enabled: false  # ?? job ?? ????
+      enabled: false
     jdbc:
       initialize-schema: never
 

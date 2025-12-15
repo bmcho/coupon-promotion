@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.time.LocalDate;
+
 @Configuration
 @EnableBatchProcessing
 @EnableTransactionManagement
@@ -25,6 +27,7 @@ public class BatchConfig {
             jobLauncher.run(
                     pointBalanceSyncJob,
                     new JobParametersBuilder()
+                            .addString("reportDate", LocalDate.now().minusDays(1).toString())
                             .addLong("timestamp", System.currentTimeMillis())
                             .toJobParameters()
             );
