@@ -1,0 +1,46 @@
+spring:
+  application.name: point-service-batch
+
+  datasource:
+    url: jdbc:mysql://coupon-mysql:3306/point
+    username: point-user
+    password: point1234!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    hikari:
+      pool-name: HikariCP
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 20000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+  sql:
+    init:
+      mode: never
+      schema-locations: classpath:org/springframework/batch/core/schema-mysql.sql, classpath:schema.sql
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  data:
+    redis:
+      host: redis-practice
+      port: 6379
+
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: never
+
+logging:
+  level:
+    org.springframework.batch: DEBUG
+    com.bmcho.pointservicebatch: DEBUG
