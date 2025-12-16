@@ -75,6 +75,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - promotion_network    # 네트워크 추가
 
   prometheus:
     image: prom/prometheus:v3.5.0
