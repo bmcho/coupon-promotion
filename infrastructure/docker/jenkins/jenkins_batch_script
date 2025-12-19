@@ -1,0 +1,134 @@
+pipeline {
+    agent any
+
+    environment {
+        JH = '/var/jenkins_home'
+        DIR_NAME = 'coupon-promotion'
+        REPO_URL = 'git@github.com:bmcho/coupon-promotion.git'
+        BRANCH   = 'main'
+
+        GRADLE_HOME = tool 'Gradle'
+        PATH = "${GRADLE_HOME}/bin:${PATH}"
+        SPRING_PROFILES_ACTIVE = 'dev'
+    }
+
+    triggers {
+        cron('0 1 * * *')
+    }
+
+    stages {
+        stage('Checkout or Update') {
+          steps {
+            script {
+              sh """
+                set -e
+
+                # --- 0) Ensure known_hosts for github.com ---
+                mkdir -p "${JH}/.ssh"
+                chmod 700 "${JH}/.ssh"
+                touch "${JH}/.ssh/known_hosts"
+                chmod 600 "${JH}/.ssh/known_hosts"
+
+                ssh-keygen -R github.com -f "${JH}/.ssh/known_hosts" >/dev/null 2>&1 || true
+                ssh-keyscan -H github.com >> "${JH}/.ssh/known_hosts"
+
+                # git/ssh가 무조건 위 known_hosts를 쓰게 강제 (root로 떠도 OK)
+                export GIT_SSH_COMMAND="ssh \
+                            -i /var/jenkins_home/.ssh/id_ed25519 \
+                            -o UserKnownHostsFile=/var/jenkins_home/.ssh/known_hosts \
+                            -o StrictHostKeyChecking=yes"
+
+                # (옵션) SSH 연결 테스트(실패해도 파이프라인 막고 싶으면 set -e 그대로 두면 됨)
+                ssh -o StrictHostKeyChecking=yes -T git@github.com || true
+
+                mkdir -p "${DIR_NAME}"
+                cd "${DIR_NAME}"
+
+                reclone () {
+                  echo "[WARN] Re-clone fresh (wipe workspace dir)"
+                  cd ..
+                  rm -rf "${DIR_NAME}"
+                  git clone --branch ${BRANCH} --single-branch "${REPO_URL}" "${DIR_NAME}"
+                  cd "${DIR_NAME}"
+                }
+
+                # 1) .git이 없거나, git repo가 아니면 바로 재클론
+                if [ ! -d ".git" ] || ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+                  reclone
+                else
+                  echo "[INFO] Repo exists. Try fetch/reset. If anything fails -> reclone"
+
+                  # origin 보정(없으면 add, 있으면 set-url)
+                  if git remote get-url origin >/dev/null 2>&1; then
+                    git remote set-url origin "${REPO_URL}"
+                  else
+                    git remote add origin "${REPO_URL}" || true
+                  fi
+
+                  # 2) fetch 실패하면 재클론
+                  if ! git fetch --prune origin; then
+                    reclone
+                  fi
+
+                  # 3) checkout/reset 실패해도 재클론
+                  if ! git checkout ${BRANCH} 2>/dev/null; then
+                    git checkout -B ${BRANCH} origin/${BRANCH} || reclone
+                  fi
+
+                  if ! git reset --hard origin/${BRANCH}; then
+                    reclone
+                  fi
+
+                  git clean -fdx
+                fi
+
+                git rev-parse --short HEAD
+              """
+            }
+          }
+        }
+
+
+        stage('Prepare and Build') {
+            steps {
+                dir("${DIR_NAME}") {
+                    script {
+                        sh 'chmod +x gradlew'
+                        echo "[INFO] Building point-service-batch..."
+                        sh './gradlew :point-service-batch:build -x test'
+                    }
+                }
+            }
+        }
+
+        stage('Point Balance Sync') {
+            steps {
+                dir("${DIR_NAME}") {
+                    script {
+                        try {
+                            echo "[INFO] Starting Point Balance Sync Job..."
+                            timeout(time: 10, unit: 'MINUTES') {
+                                sh """
+                                    ./gradlew :point-service-batch:bootRun \
+                                    --args="--job.name=pointBalanceSyncJob --spring.profiles.active=${SPRING_PROFILES_ACTIVE} --spring.main.web-application-type=none"
+                                """
+                            }
+                        } catch (Exception e) {
+                            currentBuild.result = 'FAILURE'
+                            error("Point Balance Sync Job failed: ${e.message}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check the logs.'
+        }
+    }
+}
