@@ -21,7 +21,7 @@ public class RedisConfig {
         Config config = new Config();
         config.useSingleServer()
                 .setAddress(address);
-        return Redisson.create();
+        return Redisson.create(config);
     }
 
 }
