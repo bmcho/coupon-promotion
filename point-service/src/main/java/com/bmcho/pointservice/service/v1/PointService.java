@@ -1,5 +1,6 @@
 package com.bmcho.pointservice.service.v1;
 
+import com.bmcho.pointservice.aop.PointMetered;
 import com.bmcho.pointservice.domain.Point;
 import com.bmcho.pointservice.domain.PointBalance;
 import com.bmcho.pointservice.domain.PointType;
@@ -25,6 +26,7 @@ public class PointService {
     private final PointRepository pointRepository;
     private final PointBalanceRepository pointBalanceRepository;
 
+    @PointMetered
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Point earnPoints(Long userId, Long amount, String description) {
         PointBalance balance = pointBalanceRepository.findByUserId(userId)
@@ -48,7 +50,7 @@ public class PointService {
         return pointRepository.save(point);
     }
 
-
+    @PointMetered
     @Transactional
     public Point usePoints(Long userId, Long amount, String description) {
         PointBalance balance = pointBalanceRepository.findByUserId(userId)

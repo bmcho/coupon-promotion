@@ -1,5 +1,6 @@
 package com.bmcho.pointservice.service.v2;
 
+import com.bmcho.pointservice.aop.PointMetered;
 import com.bmcho.pointservice.domain.Point;
 import com.bmcho.pointservice.domain.PointBalance;
 import com.bmcho.pointservice.domain.PointType;
@@ -42,6 +43,7 @@ public class PointRedisService {
      * 4. DB 저장 및 캐시 업데이트
      * 5. 포인트 이력 저장
      */
+    @PointMetered("v2")
     @Transactional
     public Point earnPoints(Long userId, Long amount, String description) {
         //분산락
@@ -98,6 +100,7 @@ public class PointRedisService {
      * 5. DB 저장 및 캐시 업데이트
      * 6. 포인트 이력 저장
      */
+    @PointMetered("v2")
     @Transactional
     public Point usePoints(Long userId, Long amount, String description) {
         String lockKey = POINT_LOCK_PREFIX + ":" + userId;
