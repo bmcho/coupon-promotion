@@ -1,16 +1,19 @@
 package com.bmcho.timesaleservice.exception.common;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public record ApiError(
-        ErrorCode errorCode,
-        Map<String, Object> details // 필드 에러, 원인 등 추가 정보
+        String code,
+        String message,
+        Map<String, Object> details
 ) {
-    public static ApiError of(ErrorCode errorCode) {
-        return new ApiError(errorCode, null);
+    public static ApiError from(ErrorCode errorCode) {
+        Map<String, Object> details = new HashMap<>();
+        return new ApiError(errorCode.getCode(), errorCode.getMessage(), details);
     }
 
-    public static ApiError of(ErrorCode errorCode, Map<String, Object> details) {
-        return new ApiError(errorCode, details);
+    public static ApiError from(ErrorCode errorCode, Map<String, Object> details) {
+        return new ApiError(errorCode.getCode(), errorCode.getMessage(), details);
     }
 }
