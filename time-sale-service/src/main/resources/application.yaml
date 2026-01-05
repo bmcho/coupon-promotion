@@ -19,6 +19,14 @@ spring:
       max-lifetime: 1800000
       connection-test-query: SELECT 1
 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
   # Redis ??
   data:
     redis:

@@ -1,6 +1,6 @@
 package com.bmcho.timesaleservice.exception.common;
 
-import com.bmcho.timesaleservice.controller.TimeSaleApiResponse;
+import com.bmcho.timesaleservice.controller.response.TimeSaleApiResponse;
 import com.bmcho.timesaleservice.exception.TimeSaleBasicException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

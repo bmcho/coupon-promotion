@@ -1,4 +1,4 @@
-package com.bmcho.timesaleservice.controller;
+package com.bmcho.timesaleservice.controller.response;
 
 import com.bmcho.timesaleservice.exception.common.ApiError;
 
