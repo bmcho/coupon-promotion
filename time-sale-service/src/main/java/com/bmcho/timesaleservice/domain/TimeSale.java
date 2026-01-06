@@ -99,7 +99,7 @@ public class TimeSale {
     private void validatePeriod() {
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(startAt) || now.isAfter(endAt)) {
-            throw TimeSaleException.NotInValidPeriod(startAt, endAt);
+            throw TimeSaleException.notInValidPeriod(startAt, endAt);
         }
     }
 

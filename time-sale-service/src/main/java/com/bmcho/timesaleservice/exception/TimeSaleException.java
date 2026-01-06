@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public class TimeSaleException extends TimeSaleBasicException {
-    protected TimeSaleException(ErrorCode errorCode) {
+    public TimeSaleException(ErrorCode errorCode) {
         super(errorCode);
     }
 
-    protected TimeSaleException(ErrorCode errorCode, String message, Map<String, Object> details) {
+    public TimeSaleException(ErrorCode errorCode, String message, Map<String, Object> details) {
         super(errorCode, message, details);
     }
 
@@ -62,11 +62,27 @@ public class TimeSaleException extends TimeSaleBasicException {
         );
     }
 
-    public static TimeSaleException NotInValidPeriod(LocalDateTime startAt, LocalDateTime endAt) {
+    public static TimeSaleException notInValidPeriod(LocalDateTime startAt, LocalDateTime endAt) {
         return new TimeSaleException(
                 ErrorCode.NOT_IN_PERIOD,
                 null,
                 Map.of("startAt", startAt, "endAt", endAt)
+        );
+    }
+
+    public static TimeSaleException failedToCreateRedisLock(Long timeSaleId) {
+        return new TimeSaleException(
+                ErrorCode.FAILED_TO_CREATE_REDIS_LOCK,
+                null,
+                Map.of("timeSaleId", timeSaleId)
+        );
+    }
+
+    public static TimeSaleException failedToAcquireRedisLock() {
+        return new TimeSaleException(
+                ErrorCode.FAILED_TO_ACQUIRE_REDIS_LOCK,
+                null,
+                null
         );
     }
 }

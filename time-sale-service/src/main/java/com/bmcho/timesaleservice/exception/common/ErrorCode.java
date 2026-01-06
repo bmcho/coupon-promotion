@@ -17,6 +17,10 @@ public enum ErrorCode {
     TIME_SALE_NOT_ACTIVE(HttpStatus.FORBIDDEN, "TSE2013", "타임세일 상태가 '활성화'가 아닙니다."),
     NOT_ENOUGH_QUANTITY(HttpStatus.FORBIDDEN, "TSE2014", "상품 수량이 충분하지 않습니다."),
     NOT_IN_PERIOD(HttpStatus.FORBIDDEN, "TSE2015", "타임세일 기간이 아닙니다."),
+
+    FAILED_TO_CREATE_REDIS_LOCK(HttpStatus.BAD_REQUEST, "TSE9000", "Redis Lock 생성실페"),
+    FAILED_TO_ACQUIRE_REDIS_LOCK(HttpStatus.INTERNAL_SERVER_ERROR, "TSE9001", "Redis Lock 획득실패"),
+
     ;
 
     private final HttpStatus status;
