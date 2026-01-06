@@ -1,5 +1,6 @@
 package com.bmcho.timesaleservice.domain;
 
+import com.bmcho.timesaleservice.exception.TimeSaleException;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -85,20 +86,20 @@ public class TimeSale {
 
     private void validateStatus() {
         if (status != TimeSaleStatus.ACTIVE) {
-            throw new IllegalStateException("Time sale is not active");
+            throw TimeSaleException.notActive(this.id);
         }
     }
 
     private void validateQuantity(Long quantity) {
         if (remainingQuantity < quantity) {
-            throw new IllegalStateException("Not enough quantity available");
+            throw TimeSaleException.notEnoughQuantity(this.remainingQuantity, quantity);
         }
     }
 
     private void validatePeriod() {
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(startAt) || now.isAfter(endAt)) {
-            throw new IllegalStateException("Time sale is not in valid period");
+            throw TimeSaleException.NotInValidPeriod(startAt, endAt);
         }
     }
 

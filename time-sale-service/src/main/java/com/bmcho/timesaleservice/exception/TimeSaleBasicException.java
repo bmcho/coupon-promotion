@@ -19,8 +19,4 @@ public abstract class TimeSaleBasicException extends RuntimeException {
         this.errorCode = errorCode;
         this.details = details;
     }
-
-    public static TimeSaleBasicException invalidPeriod(ErrorCode errorCode, String message) {
-
-    }
 }

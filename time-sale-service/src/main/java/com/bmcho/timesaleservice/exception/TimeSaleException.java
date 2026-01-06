@@ -1,7 +1,6 @@
 package com.bmcho.timesaleservice.exception;
 
 import com.bmcho.timesaleservice.exception.common.ErrorCode;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -44,6 +43,30 @@ public class TimeSaleException extends TimeSaleBasicException {
                 ErrorCode.INVALID_SALE_PERIOD,
                 null,
                 Map.of("discountPrice", discountPrice)
+        );
+    }
+
+    public static TimeSaleException notActive(Long timeSaleId) {
+        return new TimeSaleException(
+                ErrorCode.TIME_SALE_NOT_ACTIVE,
+                null,
+                Map.of("timeSaleId", timeSaleId)
+        );
+    }
+
+    public static TimeSaleException notEnoughQuantity(Long remainingQuantity, Long requiredQuantity) {
+        return new TimeSaleException(
+                ErrorCode.NOT_ENOUGH_QUANTITY,
+                null,
+                Map.of("remainingQuantity", remainingQuantity, "requiredQuantity", requiredQuantity)
+        );
+    }
+
+    public static TimeSaleException NotInValidPeriod(LocalDateTime startAt, LocalDateTime endAt) {
+        return new TimeSaleException(
+                ErrorCode.NOT_IN_PERIOD,
+                null,
+                Map.of("startAt", startAt, "endAt", endAt)
         );
     }
 }

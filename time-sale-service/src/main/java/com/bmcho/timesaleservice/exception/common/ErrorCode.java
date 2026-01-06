@@ -14,6 +14,9 @@ public enum ErrorCode {
     INVALID_SALE_PERIOD(HttpStatus.BAD_REQUEST, "TSE2010", "시작 시간은 종료 시간보다 이전이어야 합니다."),
     INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "TSE2011", "수량은 1개 이상이어야 합니다."),
     INVALID_DISCOUNT_PRICE(HttpStatus.BAD_REQUEST, "TSE2012", "할인 가격은 0보다 커야 합니다."),
+    TIME_SALE_NOT_ACTIVE(HttpStatus.FORBIDDEN, "TSE2013", "타임세일 상태가 '활성화'가 아닙니다."),
+    NOT_ENOUGH_QUANTITY(HttpStatus.FORBIDDEN, "TSE2014", "상품 수량이 충분하지 않습니다."),
+    NOT_IN_PERIOD(HttpStatus.FORBIDDEN, "TSE2015", "타임세일 기간이 아닙니다."),
     ;
 
     private final HttpStatus status;
