@@ -92,4 +92,15 @@ public class TimeSaleDto {
                     .build();
         }
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AsyncPurchaseResponse {
+        private String requestId;
+        private String status;
+        private Integer queuePosition;
+        private Long totalWaiting;
+    }
 }

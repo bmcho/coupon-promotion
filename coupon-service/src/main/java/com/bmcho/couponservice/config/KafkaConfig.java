@@ -17,8 +17,8 @@ import java.util.Map;
 
 @Configuration
 public class KafkaConfig {
-    private static final String BOOTSTRAP_SERVERS = "localhost:9091";
-    private static final String GROUP_ID = "coupon-service";
+        private static final String BOOTSTRAP_SERVERS = "localhost:9091";
+        private static final String GROUP_ID = "coupon-group";
 
     @Bean
     public ProducerFactory<String, CouponDto.IssueMessage> couponProducerFactory() {

@@ -20,6 +20,7 @@ import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +62,14 @@ public class TimeSaleRedisService {
         saveToRedis(savedTimeSale);
         return savedTimeSale;
     }
+
+    @Transactional(readOnly = true)
+    public Page<TimeSale> getOngoingTimeSales(Pageable pageable) {
+        LocalDateTime now = LocalDateTime.now();
+        return timeSaleRepository.findAllByStartAtBeforeAndEndAtAfterAndStatus(
+                now, TimeSaleStatus.ACTIVE, pageable);
+    }
+
 
     @Transactional(readOnly = true)
     public TimeSale getTimeSale(Long timeSaleId) {
