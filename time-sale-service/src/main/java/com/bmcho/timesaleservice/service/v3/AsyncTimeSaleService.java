@@ -1,8 +1,10 @@
 package com.bmcho.timesaleservice.service.v3;
 
 import com.bmcho.timesaleservice.domain.TimeSale;
+import com.bmcho.timesaleservice.domain.TimeSaleOrderStatus;
 import com.bmcho.timesaleservice.dto.TimeSaleDto;
 import com.bmcho.timesaleservice.service.v2.TimeSaleRedisService;
+import jdk.jshell.Snippet;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -37,15 +39,15 @@ public class AsyncTimeSaleService {
     }
 
     public TimeSaleDto.AsyncPurchaseResponse getPurchaseResult(Long timeSaleId, String requestId) {
-        RBucket<String> resultBucket = redissonClient.getBucket(RESULT_PREFIX + requestId);
-        String result = resultBucket.get();
-        String status = result != null ? result : "PENDING";
+        RBucket<TimeSaleOrderStatus> resultBucket = redissonClient.getBucket(RESULT_PREFIX + requestId);
+        TimeSaleOrderStatus result = resultBucket.get();
+        TimeSaleOrderStatus status = result != null ? result : TimeSaleOrderStatus.PENDING;
 
         // 대기 순서 정보 조회
         Integer queuePosition = null;
         Long totalWaiting = 0L;
 
-        if ("PENDING".equals(status)) {
+        if (status.equals(TimeSaleOrderStatus.PENDING)) {
             queuePosition = timeSaleProducer.getQueuePosition(timeSaleId, requestId);
             totalWaiting = timeSaleProducer.getTotalWaiting(timeSaleId);
         }

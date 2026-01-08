@@ -1,6 +1,7 @@
 package com.bmcho.timesaleservice.dto;
 
 import com.bmcho.timesaleservice.domain.TimeSale;
+import com.bmcho.timesaleservice.domain.TimeSaleOrderStatus;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -99,7 +100,7 @@ public class TimeSaleDto {
     @AllArgsConstructor
     public static class AsyncPurchaseResponse {
         private String requestId;
-        private String status;
+        private TimeSaleOrderStatus status;
         private Integer queuePosition;
         private Long totalWaiting;
     }

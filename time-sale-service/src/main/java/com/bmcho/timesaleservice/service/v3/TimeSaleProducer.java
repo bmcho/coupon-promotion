@@ -62,7 +62,7 @@ public class TimeSaleProducer {
         RAtomicLong queueSeq = redissonClient.getAtomicLong(queueSeqKey);
         long incremented = queueSeq.incrementAndGet();
         RScoredSortedSet<String> queueBucket = redissonClient.getScoredSortedSet(queueKey);
-        queueBucket.add(incremented,requestId);
+        queueBucket.add(incremented, requestId);
 
         RAtomicLong totalCounter = redissonClient.getAtomicLong(totalKey);
         totalCounter.incrementAndGet();
@@ -80,7 +80,7 @@ public class TimeSaleProducer {
         String queueKey = QUEUE_KEY + timeSaleId;
         RScoredSortedSet<String> queueBucket = redissonClient.getScoredSortedSet(queueKey);
 
-        if (queueBucket.contains(requestId) ||queueBucket.isEmpty()) {
+        if (!queueBucket.contains(requestId) || queueBucket.isEmpty()) {
             return null;
         }
 
@@ -88,7 +88,7 @@ public class TimeSaleProducer {
     }
 
     /**
-     * 총 대기 중인 요청 수를 조회
+     * 총 대기 중인 요청 수를
      */
     public Long getTotalWaiting(Long timeSaleId) {
         String totalKey = TOTAL_REQUESTS_KEY + timeSaleId;

@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TimeSalseConsumer {
+public class TimeSaleConsumer {
 
     private final TimeSaleRedisService timeSaleRedisService;
     private final TimeSaleOrderRepository timeSaleOrderRepository;
@@ -57,6 +57,9 @@ public class TimeSalseConsumer {
 
             // 변경 사항 저장
             timeSaleRepository.save(timeSale);
+
+            // Redis에 변경사항 저장
+            timeSaleRedisService.saveToRedis(timeSale);
 
             // 주문정보 생성 및 저장
             TimeSaleOrder order = TimeSaleOrder.builder()
