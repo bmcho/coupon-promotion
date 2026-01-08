@@ -1,5 +1,6 @@
 package com.bmcho.timesaleservice.service.v3;
 
+import com.bmcho.timesaleservice.aop.TimeSaleMetered;
 import com.bmcho.timesaleservice.domain.TimeSale;
 import com.bmcho.timesaleservice.domain.TimeSaleOrderStatus;
 import com.bmcho.timesaleservice.dto.TimeSaleDto;
@@ -33,6 +34,7 @@ public class AsyncTimeSaleService {
         return timeSaleRedisService.getOngoingTimeSales(pageable);
     }
 
+    @TimeSaleMetered("v3")
     public String purchaseTimeSale(Long timeSaleId, TimeSaleDto.PurchaseRequest request) {
         // 구매 요청을 Kafka로 전송하고 요청 ID를 반환
         return timeSaleProducer.sendPurchaseRequest(timeSaleId, request.getUserId(), request.getQuantity());
