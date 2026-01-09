@@ -1,4 +1,4 @@
-# Coupon Promotion 플랫폼
+# Coupon Promotion 개요
 
 쿠폰 발급, 포인트 적립, 타임세일 운영 같은 프로모션 업무를 서비스별로 분리해 운영 효율과 확장성을 높이기 위한 플랫폼입니다. 각 서비스가 독립적으로 배포·확장되도록 구성되어 있어, 이벤트 성격에 맞는 트래픽 대응과 장애 격리가 가능합니다.
 
@@ -8,6 +8,16 @@
 - Gateway에서 인증/레이트리밋을 처리하고, Eureka로 서비스 디스커버리를 수행합니다.
 - Redis, Kafka, 배치 작업을 통해 대량 발급/적립 시나리오와 비동기 처리를 지원합니다.
 - Prometheus/Grafana로 서비스 메트릭을 수집하고 관측성을 확보합니다.
+
+## 기술 스택
+
+- Java 17, Spring Boot 3.5.x
+- Spring Cloud Gateway, Eureka
+- JPA, MySQL
+- Redis, Redisson
+- Kafka, Spring Batch
+- Prometheus, Grafana
+- Docker, Docker Compose
 
 ## 구성 서비스
 
@@ -35,33 +45,6 @@
 | Grafana | `3000` | 대시보드 |
 | Jenkins | `8888` | CI/CD |
 
-## 실행 방법
-
-### 1) 인프라 기동
-
-```bash
-docker compose -f infrastructure/docker-compose.yml up -d
-```
-
-### 2) 서비스 실행 (로컬 개발)
-
-Eureka → Gateway → 도메인 서비스 순서로 실행을 권장합니다.
-
-```bash
-./gradlew :discovery-service:bootRun
-./gradlew :api-gateway:bootRun
-./gradlew :user-service:bootRun
-./gradlew :coupon-service:bootRun
-./gradlew :point-service:bootRun
-./gradlew :time-sale-service:bootRun
-```
-
-배치 작업은 필요 시 별도로 실행합니다.
-
-```bash
-./gradlew :point-service-batch:bootRun
-```
-
 ## Observability
 
 `coupon-service`, `point-service`, `time-sale-service`는 `/actuator/prometheus` 엔드포인트를 통해 메트릭을 노출합니다. Prometheus/Grafana 설정은 `infrastructure/prometheus` 및 `infrastructure/grafana` 디렉터리를 참고하세요.
@@ -74,12 +57,3 @@ Eureka → Gateway → 도메인 서비스 순서로 실행을 권장합니다.
 - **API 문서화**: Springdoc(OpenAPI) 추가로 Gateway 뒤 서비스별 API 문서 제공.
 - **통합 테스트 강화**: Kafka/Redis를 포함한 통합 테스트와 부하 테스트를 파이프라인에 통합.
 
-## 기술 스택
-
-- Java 17, Spring Boot 3.5.x, Spring Cloud 2025.0.0
-- Spring Cloud Gateway, Eureka
-- JPA, MySQL, H2
-- Redis, Redisson
-- Kafka, Spring Batch
-- Prometheus, Grafana
-- Docker, Docker Compose
